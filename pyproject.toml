@@ -1,0 +1,16 @@
+[project]
+name = "krakow-bus-delays-analysis"
+version = "0.1.0"
+description = "Eksploracja i analiza przestrzenno-czasowa opoznien KMK"
+requires-python = ">=3.12"
+dependencies = [
+    "duckdb",
+    "pandas",
+    "pyarrow",
+    "matplotlib",
+    "seaborn",
+    "jupyter",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
