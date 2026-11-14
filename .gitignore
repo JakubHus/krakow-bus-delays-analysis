@@ -218,3 +218,17 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Dane - nigdy nie trafiają do repo (są osobno, poza projektem)
+data/
+*.parquet
+
+# Produkty analizy (wykresy, tabele) - generowane, nie wersjonowane
+outputs/*
+!outputs/.gitkeep
+
+# Notebooki - checkpointy Jupytera
+.ipynb_checkpoints/
+
+# PyCharm - ustawienia IDE specyficzne dla maszyny
+.idea/
