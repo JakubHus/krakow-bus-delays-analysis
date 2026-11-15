@@ -23,14 +23,14 @@ def consolidate_trip_updates(raw_path: Path, feed: str, dates: list[str] | None 
         dates: opcjonalna lista dat w formacie 'YYYY-MM-DD' do zawężenia;
                None -> wszystkie dostępne dni w raw_path
     """
-    wzorzec = trip_updates_glob(raw_path)
+    path_pattern = trip_updates_glob(raw_path)
 
-    filtr_dat = ""
+    date_filter = ""
     if dates:
-        lista = ", ".join(f"'{d}'" for d in dates)
-        filtr_dat = f"AND date IN ({lista})"
+        date_list = ", ".join(f"'{d}'" for d in dates)
+        date_filter = f"AND date IN ({date_list})"
 
-    zapytanie = f"""
+    query = f"""
         SELECT
             date,
             trip_id,
@@ -40,11 +40,11 @@ def consolidate_trip_updates(raw_path: Path, feed: str, dates: list[str] | None 
             arg_max(arrival_delay, observed_at)   AS arrival_delay,
             arg_max(departure_delay, observed_at) AS departure_delay,
             arg_max(arrival_time, observed_at)    AS arrival_time,
-            count(*)                              AS liczba_obserwacji,
-            max(observed_at)                      AS ostatnia_obserwacja,
-            (max(observed_at) - arg_max(arrival_time, observed_at)) > 7200 AS niepewny_kurs
-        FROM read_parquet('{wzorzec}', {READ_PARQUET_OPTS})
-        WHERE feed = '{feed}' {filtr_dat}
+            count(*)                              AS observation_count,
+            max(observed_at)                      AS last_observed_at,
+            (max(observed_at) - arg_max(arrival_time, observed_at)) > 7200 AS uncertain_completion
+        FROM read_parquet('{path_pattern}', {READ_PARQUET_OPTS})
+        WHERE feed = '{feed}' {date_filter}
         GROUP BY date, trip_id, stop_id
         """
-    return duckdb.query(zapytanie).to_df()
+    return duckdb.query(query).to_df()
